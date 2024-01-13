@@ -1,0 +1,27 @@
+.square {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 75px;
+    height: 75px;
+    line-height: 75px;
+    font-size: 50px;
+    cursor: pointer;
+}
+.even {
+    background-color: rgba(119,153,84,255);
+}
+.odd {
+    background-color: rgba(233,237,204,255);
+}
+#gameContainer{
+    font-family: 'Roboto', sans-serif;
+    font-weight: 1000;
+    text-align: center;
+}
+#boardContainer{
+    display: grid;
+    grid-template-columns: repeat(8, auto);
+    width: 550px;
+    margin: auto;
+}
