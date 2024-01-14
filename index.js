@@ -5,15 +5,17 @@ const restartBtn = document.querySelector("#restartBtn");
 let board = Array.from({ length: 8}, () => Array(8).fill(''));
 let currentPlayer = "White";
 let running = false;
-let isSecondMove = false;
+let isSecondClick = false;
 let currentPiece = "";
+let previousPieceRow = -1;
+let previousPieceColumn = -1;
 //create two arrays, each for the pieces that were taken from the other player  (white and black)
 
 initialiseGame();
 
 function initialiseGame() {
     squares.forEach (square => {
-        square.addEventListener("click", squareClicked);
+        square.addEventListener("click", clickManagement);
     });
     restartBtn.addEventListener("click", restartGame);
     statusText.textContent = `${currentPlayer}'s turn`;
@@ -49,8 +51,57 @@ function setInitialBoard() {
     }
 }
 
-function squareClicked() {
-    const squareIndex = this.getAttribute("squareIndex"); //13 -> [1][5]
+function clickManagement() {
+    console.log(board[5][3]);
+    if (!isSecondClick) {
+        const squareIndex = this.getAttribute("squareIndex");
+        previousPieceRow = Math.floor(squareIndex / 8);
+        previousPieceColumn = squareIndex - (previousPieceRow * 8);
+        squareClicked(squareIndex);
+        isSecondClick = true;
+    } else {
+        const squareIndex = this.getAttribute("squareIndex");
+
+        const row = Math.floor(squareIndex / 8);
+        const column = squareIndex - (row * 8);
+
+        if (board[row][column].charAt(0) === "*" || board[row][column].charAt(0) === "(") {
+            board[row][column] = currentPiece;
+            updateSquare(row, column, currentPiece);
+            updateSquare(previousPieceRow, previousPieceColumn, "");
+            currentPiece = "";
+            changePlayer();
+            clearStarAndBracket();
+            previousPieceRow = -1;
+            previousPieceColumn = -1;
+            isSecondClick = false;
+        } else if (board[row][column].charAt(1) != currentPlayer.charAt(0).toLowerCase() || board[row][column] === "") { //clicked on opponents piece
+            isSecondClick = !isSecondClick;
+            clearStarAndBracket();
+        } else {
+            clearStarAndBracket();
+            squareClicked(squareIndex);
+            previousPieceRow = Math.floor(squareIndex / 8);
+            previousPieceColumn = squareIndex - (previousPieceRow * 8);
+        }
+    }
+}
+
+function clearStarAndBracket() {
+    for (let row = 0; row < 8; row++) {
+        for (let column = 0; column < 8; column++) {
+            if (board[row][column] === "*") {
+                board[row][column] = "";
+                updateSquare(row, column, "");
+            } else if (board[row][column].charAt(0) === "(") {
+                board[row][column] = board[row][column].substring(1, board[row][column] - 1);
+                updateSquare(row, column, board[row][column].substring(1, board[row][column] - 1))
+            }
+        }
+    }
+}
+
+function squareClicked(squareIndex) {
     let row = Math.floor(squareIndex / 8); //1
     let column = squareIndex - (row * 8); //13 - 8 = 5
 
@@ -164,7 +215,7 @@ function pawn(row, column) {
                 possibleMoves.push([newRow, newColumn]);
             } else if (i === 1 && board[newRow-1][newColumn] === "" && board[newRow][newColumn] === "" && isValidMove(newRow, newColumn) && newRow === 3) {
                 possibleMoves.push([newRow, newColumn]);
-            } else if (i > 1 && isValidMove(newRow, newColumn)) {
+            } else if (i > 1 && isValidMove(newRow, newColumn) && board[newRow][newColumn] != "") {
                 possibleMoves.push([newRow, newColumn]);
             }
         }
