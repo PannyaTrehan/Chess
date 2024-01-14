@@ -8,6 +8,17 @@
     font-size: 50px;
     cursor: pointer;
 }
+.square img {
+    width: 65%;
+}
+
+img.pawn {
+    width:60%;
+}
+
+img.other {
+    width: 75%;
+}
 .even {
     background-color: rgba(119,153,84,255);
 }

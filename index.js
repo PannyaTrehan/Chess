@@ -34,10 +34,12 @@ function setInitialBoard() {
             const squareToUpdate = document.querySelector(`[squareIndex="${row * 8 + column}"]`);
             if (row === 0) {
                 board[row][column] = (pieces[1][column] + "b");
-                squareToUpdate.textContent = (pieces[1][column] + "b");
+                updateSquare(row, column, board[row][column]);
+                //squareToUpdate.textContent = (pieces[1][column] + "b");
             } else {
                 board[row][column] = (pieces[0][column] + "b");
-                squareToUpdate.textContent = (pieces[0][column] + "b");
+                updateSquare(row, column, board[row][column]);
+                //squareToUpdate.textContent = (pieces[0][column] + "b");
             }
         }
     }
@@ -46,19 +48,23 @@ function setInitialBoard() {
         for (let column = 0; column < 8; column++) {
             const squareToUpdate = document.querySelector(`[squareIndex="${row * 8 + column}"]`);
             board[row][column] = (pieces[row - 6][column] + "w");
-            squareToUpdate.textContent = (pieces[row - 6][column] + "w");
+            updateSquare(row, column, board[row][column]);
+            //squareToUpdate.textContent = (pieces[row - 6][column] + "w");
         }
     }
 }
 
 function clickManagement() {
-    console.log(board[5][3]);
+    console.log(board[3][4]);
     if (!isSecondClick) {
+        clearStarAndBracket();
         const squareIndex = this.getAttribute("squareIndex");
         previousPieceRow = Math.floor(squareIndex / 8);
         previousPieceColumn = squareIndex - (previousPieceRow * 8);
-        squareClicked(squareIndex);
-        isSecondClick = true;
+        if (board[previousPieceRow][previousPieceColumn].charAt(1) === currentPlayer.charAt(0).toLowerCase()) {
+            squareClicked(squareIndex);
+            isSecondClick = true;
+        }
     } else {
         const squareIndex = this.getAttribute("squareIndex");
 
@@ -66,9 +72,13 @@ function clickManagement() {
         const column = squareIndex - (row * 8);
 
         if (board[row][column].charAt(0) === "*" || board[row][column].charAt(0) === "(") {
+
             board[row][column] = currentPiece;
             updateSquare(row, column, currentPiece);
+
+            board[previousPieceRow][previousPieceColumn] = "";
             updateSquare(previousPieceRow, previousPieceColumn, "");
+            
             currentPiece = "";
             changePlayer();
             clearStarAndBracket();
@@ -93,7 +103,7 @@ function clearStarAndBracket() {
             if (board[row][column] === "*") {
                 board[row][column] = "";
                 updateSquare(row, column, "");
-            } else if (board[row][column].charAt(0) === "(") {
+            } else if (board[row][column].charAt(0) === "(" && board[row][column].length === 3) {
                 board[row][column] = board[row][column].substring(1, board[row][column] - 1);
                 updateSquare(row, column, board[row][column].substring(1, board[row][column] - 1))
             }
@@ -132,8 +142,54 @@ function squareClicked(squareIndex) {
 }
 
 function updateSquare(row, column, input) { //will not modify the board array
+
     const squareToUpdate = document.querySelector(`[squareIndex="${toIndex(row, column)}"]`);
-    squareToUpdate.textContent = input;
+
+    squareToUpdate.innerHTML = "";
+    
+    // Clear the square's content before adding new content
+    const imageElement = document.createElement("img");
+    imageElement.src = getImagePath(input);
+
+    if (input.includes("Pb")  || input.includes("Pw")) {
+        imageElement.classList.add("pawn");
+    } else if (!(input.includes("R") || input.includes("N"))) {
+        imageElement.classList.add("other");
+    }
+
+    squareToUpdate.appendChild(imageElement);
+}
+
+function getImagePath(piece) {
+    if (piece.includes("*")) {
+        return "Pieces/Blank/dot.png";
+    } else if (piece.includes("Pb")) {
+        return "Pieces/Black/pawn.png";
+    } else if (piece.includes("Rb")) {
+        return "Pieces/Black/rook.png";
+    } else if (piece.includes("Kb")) {
+        return "Pieces/Black/king.png";
+    } else if (piece.includes("Qb")) {
+        return "Pieces/Black/queen.png";
+    } else if (piece.includes("Bb")) {
+        return "Pieces/Black/bishop.png";
+    } else if (piece.includes("Nb")) {
+        return "Pieces/Black/knight.png";
+    } else if (piece.includes("Pw")) {
+        return "Pieces/White/pawn.png";
+    } else if (piece.includes("Rw")) {
+        return "Pieces/White/rook.png";
+    } else if (piece.includes("Kw")) {
+        return "Pieces/White/king.png";
+    } else if (piece.includes("Qw")) {
+        return "Pieces/White/queen.png";
+    } else if (piece.includes("Bw")) {
+        return "Pieces/White/bishop.png";
+    } else if (piece.includes("Nw")) {
+        return "Pieces/White/knight.png";
+    } else {
+        return "";
+    }
 }
 
 function changePlayer() {
