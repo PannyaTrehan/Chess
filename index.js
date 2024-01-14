@@ -364,9 +364,107 @@ function rook(row, column) {
 }
 
 function queen(row, column) {
+    let possibleMoves = [];
+
+    for (let rowIncrease = row + 1; rowIncrease < 8; rowIncrease++) {
+        if (isValidMove(rowIncrease, column)) {
+            possibleMoves.push([rowIncrease, column]);
+            console.log("1");
+        } else {
+            break;
+        }
+    }
+
+    for (let rowDecrease = row - 1; rowDecrease >= 0; rowDecrease--) {
+        console.log("here");
+        if (isValidMove(rowDecrease, column)) {
+            possibleMoves.push([rowDecrease, column]);
+            console.log("1");
+        } else {
+            break;
+        }
+    }
+
+    for (let columnIncrease = column + 1; columnIncrease < 8; columnIncrease++) {
+        if (isValidMove(row, columnIncrease)) {
+            possibleMoves.push([row, columnIncrease]);
+        } else {
+            break;
+        }
+    }
+
+    for (let columnDecrease = column - 1; columnDecrease >= 0; columnDecrease--) {
+        if (isValidMove(row, columnDecrease)) {
+            possibleMoves.push([row, columnDecrease]);
+        } else {
+            break;
+        }
+    }
+
+    for (let i = 1; i < 8; i++) {
+        if (isValidMove(row - i, column + i)) {
+            possibleMoves.push([row - i, column + i]);
+        } else {
+            break;
+        }
+    }
+    //top left diagonal
+    for (let i = 1; i < 8; i++) {
+        if (isValidMove(row - i, column - i)) {
+            possibleMoves.push([row - i, column - i]);
+        } else {
+            break;
+        }
+    }
+
+    for (let i = 1; i < 8; i++) {
+        if (isValidMove(row + i, column + i)) {
+            possibleMoves.push([row + i, column + i]);
+        } else {
+            break;
+        }
+    }
+
+    for (let i = 1; i < 8; i++) {
+        if (isValidMove(row + i, column - i)) {
+            possibleMoves.push([row + i, column - i]);
+        } else {
+            break;
+        }
+    }
+
+    placePossibleMove(possibleMoves);
 
 }
 
 function king(row, column) {
+    let possibleMoves = [];
 
+    const movements = [
+        [0, 1],
+        [1, 0],
+        [-1, 0],
+        [0, -1],
+        [1, 1],
+        [-1, -1],
+        [-1, 1],
+        [1, -1],
+    ];
+
+    for (let i = 0; i < movements.length; i++) {
+        if (isValidMove(row + movements[i][0], column + movements[i][1])) {
+            possibleMoves.push([row + movements[i][0], column + movements[i][1]]);
+        }
+    }
+
+    placePossibleMove(possibleMoves);
+}
+
+function isCheck() {
+    //try combining this with the isValid function (into 1)
+
+    //this function checks if the board location for where the king will move to will be a check
+    //to check this simply look at all the possible movements for the opposing players pieces
+        //if there is a possible movement that attacks the piece of where the king could move to then it is not allowed
+        //similarly this check should apply for all pieces
 }
