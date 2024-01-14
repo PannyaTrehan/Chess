@@ -5,6 +5,9 @@ const restartBtn = document.querySelector("#restartBtn");
 let board = Array.from({ length: 8}, () => Array(8).fill(''));
 let currentPlayer = "White";
 let running = false;
+let isSecondMove = false;
+let currentPiece = "";
+//create two arrays, each for the pieces that were taken from the other player  (white and black)
 
 initialiseGame();
 
@@ -47,9 +50,11 @@ function setInitialBoard() {
 }
 
 function squareClicked() {
-    const squareIndex = this.getAttribute("squareIndex");
-    let row = Math.floor(squareIndex / 8);
-    let column = squareIndex - (row * 8);
+    const squareIndex = this.getAttribute("squareIndex"); //13 -> [1][5]
+    let row = Math.floor(squareIndex / 8); //1
+    let column = squareIndex - (row * 8); //13 - 8 = 5
+
+    currentPiece = board[row][column];
 
     switch(board[row][column].charAt(0)) {
         case "P":
@@ -71,9 +76,8 @@ function squareClicked() {
             king(row, column);
             break;
         default:
+            currentPiece = "";
     }
-
-    console.log(board[row][column].charAt(0));
 }
 
 function updateSquare(row, column, input) { //will not modify the board array
@@ -140,15 +144,14 @@ function pawn(row, column) {
     let possibleMoves = []; //vector to store movements
     if (currentPlayer === "White") {
         for (let i = 0; i < whiteMovements.length; i++) {
-            console.log("Wjote");
             const newRow = row + whiteMovements[i][0];
             const newColumn = column + whiteMovements[i][1];
     
             if (i === 0 && board[newRow][newColumn] === "" && isValidMove(newRow, newColumn)) {
                 possibleMoves.push([newRow, newColumn]);
-            } else if (i === 1 && board[newRow+1][newColumn] === "" && board[newRow][newColumn] === "" && isValidMove(newRow, newColumn)) {
+            } else if (i === 1 && board[newRow+1][newColumn] === "" && board[newRow][newColumn] === "" && isValidMove(newRow, newColumn) && newRow === 4) {
                 possibleMoves.push([newRow, newColumn]);
-            } else if (i > 1 && isValidMove(newRow, newColumn)) {
+            } else if (i > 1 && isValidMove(newRow, newColumn) && board[newRow][newColumn] != "") {
                 possibleMoves.push([newRow, newColumn]);
             }
         }
@@ -159,7 +162,7 @@ function pawn(row, column) {
     
             if (i === 0 && board[newRow][newColumn] === "" && isValidMove(newRow, newColumn)) {
                 possibleMoves.push([newRow, newColumn]);
-            } else if (i === 1 && board[newRow-1][newColumn] === "" && board[newRow][newColumn] === "" && isValidMove(newRow, newColumn)) {
+            } else if (i === 1 && board[newRow-1][newColumn] === "" && board[newRow][newColumn] === "" && isValidMove(newRow, newColumn) && newRow === 3) {
                 possibleMoves.push([newRow, newColumn]);
             } else if (i > 1 && isValidMove(newRow, newColumn)) {
                 possibleMoves.push([newRow, newColumn]);
