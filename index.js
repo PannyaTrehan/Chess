@@ -281,6 +281,41 @@ function pawn(row, column) {
 }
 
 function bishop(row, column) {
+    let possibleMoves = [];
+    //top right diagonal
+    for (let i = 1; i < 8; i++) {
+        if (isValidMove(row - i, column + i)) {
+            possibleMoves.push([row - i, column + i]);
+        } else {
+            break;
+        }
+    }
+    //top left diagonal
+    for (let i = 1; i < 8; i++) {
+        if (isValidMove(row - i, column - i)) {
+            possibleMoves.push([row - i, column - i]);
+        } else {
+            break;
+        }
+    }
+
+    for (let i = 1; i < 8; i++) {
+        if (isValidMove(row + i, column + i)) {
+            possibleMoves.push([row + i, column + i]);
+        } else {
+            break;
+        }
+    }
+
+    for (let i = 1; i < 8; i++) {
+        if (isValidMove(row + i, column - i)) {
+            possibleMoves.push([row + i, column - i]);
+        } else {
+            break;
+        }
+    }
+
+    placePossibleMove(possibleMoves);
 
 }
 
@@ -289,7 +324,43 @@ function knight(row, column) {
 }
 
 function rook(row, column) {
+    let possibleMoves = [];
+    for (let rowIncrease = row + 1; rowIncrease < 8; rowIncrease++) {
+        if (isValidMove(rowIncrease, column)) {
+            possibleMoves.push([rowIncrease, column]);
+            console.log("1");
+        } else {
+            break;
+        }
+    }
 
+    for (let rowDecrease = row - 1; rowDecrease >= 0; rowDecrease--) {
+        console.log("here");
+        if (isValidMove(rowDecrease, column)) {
+            possibleMoves.push([rowDecrease, column]);
+            console.log("1");
+        } else {
+            break;
+        }
+    }
+
+    for (let columnIncrease = column + 1; columnIncrease < 8; columnIncrease++) {
+        if (isValidMove(row, columnIncrease)) {
+            possibleMoves.push([row, columnIncrease]);
+        } else {
+            break;
+        }
+    }
+
+    for (let columnDecrease = column - 1; columnDecrease >= 0; columnDecrease--) {
+        if (isValidMove(row, columnDecrease)) {
+            possibleMoves.push([row, columnDecrease]);
+        } else {
+            break;
+        }
+    }
+
+    placePossibleMove(possibleMoves);
 }
 
 function queen(row, column) {
