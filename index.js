@@ -103,9 +103,9 @@ function clearStarAndBracket() {
             if (board[row][column] === "*") {
                 board[row][column] = "";
                 updateSquare(row, column, "");
-            } else if (board[row][column].charAt(0) === "(" && board[row][column].length === 3) {
-                board[row][column] = board[row][column].substring(1, board[row][column] - 1);
-                updateSquare(row, column, board[row][column].substring(1, board[row][column] - 1))
+            } else if (board[row][column].charAt(0) === "(" && board[row][column].length > 2) {
+                board[row][column] = board[row][column].replace(/[()]/g, '');
+                updateSquare(row, column, board[row][column]);
             }
         }
     }
@@ -151,10 +151,14 @@ function updateSquare(row, column, input) { //will not modify the board array
     const imageElement = document.createElement("img");
     imageElement.src = getImagePath(input);
 
-    if (input.includes("Pb")  || input.includes("Pw")) {
-        imageElement.classList.add("pawn");
-    } else if (!(input.includes("R") || input.includes("N"))) {
-        imageElement.classList.add("other");
+    // if (input.includes("Pb")  || input.includes("Pw")) {
+    //     imageElement.classList.add("pawn");
+    // } else if (!(input.includes("R") || input.includes("N"))) {
+    //     imageElement.classList.add("other");
+    // }
+
+    if (input.includes("(")) {
+        imageElement.classList.add("attacked");
     }
 
     squareToUpdate.appendChild(imageElement);
@@ -164,28 +168,64 @@ function getImagePath(piece) {
     if (piece.includes("*")) {
         return "Pieces/Blank/dot.png";
     } else if (piece.includes("Pb")) {
+        if (piece.includes("(")) {
+            return "Pieces/Black/Attacked/pawn.png";
+        }
         return "Pieces/Black/pawn.png";
     } else if (piece.includes("Rb")) {
+        if (piece.includes("(")) {
+            return "Pieces/Black/Attacked/rook.png";
+        }
         return "Pieces/Black/rook.png";
     } else if (piece.includes("Kb")) {
+        if (piece.includes("(")) {
+            return "Pieces/Black/Attacked/king.png";
+        }
         return "Pieces/Black/king.png";
     } else if (piece.includes("Qb")) {
+        if (piece.includes("(")) {
+            return "Pieces/Black/Attacked/queen.png";
+        }
         return "Pieces/Black/queen.png";
     } else if (piece.includes("Bb")) {
+        if (piece.includes("(")) {
+            return "Pieces/Black/Attacked/bishop.png";
+        }
         return "Pieces/Black/bishop.png";
     } else if (piece.includes("Nb")) {
+        if (piece.includes("(")) {
+            return "Pieces/Black/Attacked/knight.png";
+        }
         return "Pieces/Black/knight.png";
     } else if (piece.includes("Pw")) {
+        if (piece.includes("(")) {
+            return "Pieces/White/Attacked/pawn.png";
+        }
         return "Pieces/White/pawn.png";
     } else if (piece.includes("Rw")) {
+        if (piece.includes("(")) {
+            return "Pieces/White/Attacked/rook.png";
+        }
         return "Pieces/White/rook.png";
     } else if (piece.includes("Kw")) {
+        if (piece.includes("(")) {
+            return "Pieces/White/Attacked/king.png";
+        }
         return "Pieces/White/king.png";
     } else if (piece.includes("Qw")) {
+        if (piece.includes("(")) {
+            return "Pieces/White/Attacked/queen.png";
+        }
         return "Pieces/White/queen.png";
     } else if (piece.includes("Bw")) {
+        if (piece.includes("(")) {
+            return "Pieces/White/Attacked/bishop.png";
+        }
         return "Pieces/White/bishop.png";
     } else if (piece.includes("Nw")) {
+        if (piece.includes("(")) {
+            return "Pieces/White/Attacked/knight.png";
+        }
         return "Pieces/White/knight.png";
     } else {
         return "";
@@ -230,7 +270,7 @@ function placePossibleMove(possibleMoves) {
 }
 
 function isValidMove(row, column) {
-    return row >= 0 && row < board.length && column >= 0 && column < board[0].length && board[row][column].charAt(1) != currentPlayer.charAt(0).toLowerCase();
+        return row >= 0 && row < board.length && column >= 0 && column < board[0].length && board[row][column].charAt(1) != currentPlayer.charAt(0).toLowerCase();    
 }
 
 function pawn(row, column) {
@@ -286,6 +326,9 @@ function bishop(row, column) {
     for (let i = 1; i < 8; i++) {
         if (isValidMove(row - i, column + i)) {
             possibleMoves.push([row - i, column + i]);
+            if (checkOpponentPiece(row - i, column + i)) {
+                break;
+            }
         } else {
             break;
         }
@@ -294,6 +337,9 @@ function bishop(row, column) {
     for (let i = 1; i < 8; i++) {
         if (isValidMove(row - i, column - i)) {
             possibleMoves.push([row - i, column - i]);
+            if (checkOpponentPiece(row - i, column - i)) {
+                break;
+            }
         } else {
             break;
         }
@@ -302,6 +348,9 @@ function bishop(row, column) {
     for (let i = 1; i < 8; i++) {
         if (isValidMove(row + i, column + i)) {
             possibleMoves.push([row + i, column + i]);
+            if (checkOpponentPiece(row + i, column + i)) {
+                break;
+            }
         } else {
             break;
         }
@@ -310,6 +359,9 @@ function bishop(row, column) {
     for (let i = 1; i < 8; i++) {
         if (isValidMove(row + i, column - i)) {
             possibleMoves.push([row + i, column - i]);
+            if (checkOpponentPiece(row + i, column - i)) {
+                break;
+            }
         } else {
             break;
         }
@@ -320,26 +372,65 @@ function bishop(row, column) {
 }
 
 function knight(row, column) {
+    const movements = [
+        [-2, 1],
+        [-2, -1],
+        [2, 1],
+        [2, -1],
+        [1, 2],
+        [1, -2],
+        [-1, 2],
+        [-1, -2]
+    ];
 
+    let possibleMoves = [];
+
+    for (let i = 0; i < movements.length; i++) {
+        if (isValidMove(row + movements[i][0], column + movements[i][1])) {
+            possibleMoves.push([row + movements[i][0], column + movements[i][1]]);
+        }
+    }
+
+    placePossibleMove(possibleMoves);
+
+}
+
+function checkOpponentPiece(row, column) {
+    if (currentPlayer === "White") {
+        if (board[row][column].includes("b")) {
+            return true;
+        }
+    } else {
+        if (board[row][column].includes("w")) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 function rook(row, column) {
     let possibleMoves = [];
+    
     for (let rowIncrease = row + 1; rowIncrease < 8; rowIncrease++) {
         if (isValidMove(rowIncrease, column)) {
             possibleMoves.push([rowIncrease, column]);
-            console.log("1");
+            if (checkOpponentPiece(rowIncrease, column)) {
+                break;
+            }
         } else {
             break;
         }
     }
 
     for (let rowDecrease = row - 1; rowDecrease >= 0; rowDecrease--) {
-        console.log("here");
         if (isValidMove(rowDecrease, column)) {
             possibleMoves.push([rowDecrease, column]);
-            console.log("1");
+            if (checkOpponentPiece(rowDecrease, column)) {
+                break;
+            }
         } else {
+            console.log("reached");
             break;
         }
     }
@@ -347,6 +438,9 @@ function rook(row, column) {
     for (let columnIncrease = column + 1; columnIncrease < 8; columnIncrease++) {
         if (isValidMove(row, columnIncrease)) {
             possibleMoves.push([row, columnIncrease]);
+            if (checkOpponentPiece(row, columnIncrease)) {
+                break;
+            }
         } else {
             break;
         }
@@ -355,6 +449,9 @@ function rook(row, column) {
     for (let columnDecrease = column - 1; columnDecrease >= 0; columnDecrease--) {
         if (isValidMove(row, columnDecrease)) {
             possibleMoves.push([row, columnDecrease]);
+            if (checkOpponentPiece(row, columnDecrease)) {
+                break;
+            }
         } else {
             break;
         }
@@ -369,18 +466,22 @@ function queen(row, column) {
     for (let rowIncrease = row + 1; rowIncrease < 8; rowIncrease++) {
         if (isValidMove(rowIncrease, column)) {
             possibleMoves.push([rowIncrease, column]);
-            console.log("1");
+            if (checkOpponentPiece(rowIncrease, column)) {
+                break;
+            }
         } else {
             break;
         }
     }
 
     for (let rowDecrease = row - 1; rowDecrease >= 0; rowDecrease--) {
-        console.log("here");
         if (isValidMove(rowDecrease, column)) {
             possibleMoves.push([rowDecrease, column]);
-            console.log("1");
+            if (checkOpponentPiece(rowDecrease, column)) {
+                break;
+            }
         } else {
+            console.log("reached");
             break;
         }
     }
@@ -388,6 +489,9 @@ function queen(row, column) {
     for (let columnIncrease = column + 1; columnIncrease < 8; columnIncrease++) {
         if (isValidMove(row, columnIncrease)) {
             possibleMoves.push([row, columnIncrease]);
+            if (checkOpponentPiece(row, columnIncrease)) {
+                break;
+            }
         } else {
             break;
         }
@@ -396,6 +500,9 @@ function queen(row, column) {
     for (let columnDecrease = column - 1; columnDecrease >= 0; columnDecrease--) {
         if (isValidMove(row, columnDecrease)) {
             possibleMoves.push([row, columnDecrease]);
+            if (checkOpponentPiece(row, columnDecrease)) {
+                break;
+            }
         } else {
             break;
         }
@@ -404,6 +511,9 @@ function queen(row, column) {
     for (let i = 1; i < 8; i++) {
         if (isValidMove(row - i, column + i)) {
             possibleMoves.push([row - i, column + i]);
+            if (checkOpponentPiece(row - i, column + i)) {
+                break;
+            }
         } else {
             break;
         }
@@ -412,6 +522,9 @@ function queen(row, column) {
     for (let i = 1; i < 8; i++) {
         if (isValidMove(row - i, column - i)) {
             possibleMoves.push([row - i, column - i]);
+            if (checkOpponentPiece(row - i, column - i)) {
+                break;
+            }
         } else {
             break;
         }
@@ -420,6 +533,9 @@ function queen(row, column) {
     for (let i = 1; i < 8; i++) {
         if (isValidMove(row + i, column + i)) {
             possibleMoves.push([row + i, column + i]);
+            if (checkOpponentPiece(row + i, column + i)) {
+                break;
+            }
         } else {
             break;
         }
@@ -428,6 +544,9 @@ function queen(row, column) {
     for (let i = 1; i < 8; i++) {
         if (isValidMove(row + i, column - i)) {
             possibleMoves.push([row + i, column - i]);
+            if (checkOpponentPiece(row + i, column - i)) {
+                break;
+            }
         } else {
             break;
         }

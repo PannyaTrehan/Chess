@@ -9,11 +9,11 @@
     cursor: pointer;
 }
 .square img {
-    width: 65%;
+    width: 72.5%;
 }
 
-img.pawn {
-    width:60%;
+img.attacked {
+    width:90%;
 }
 
 img.other {
